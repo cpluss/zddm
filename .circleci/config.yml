@@ -1,0 +1,46 @@
+version: 2.1
+
+executors:
+  exectr:
+    docker:
+      - image: cimg/base:stable
+
+jobs:
+  cpp-build:
+    executor: exectr
+    steps:
+      - checkout
+      - run:
+          name: Setup cmake and build artifacts
+          command: |
+            cd lib/cpp/
+            mkdir build
+            cd build
+            cmake ..
+            cmake --build .
+      - persist_to_workspace:
+          root: .
+          paths: lib/cpp/build
+
+  cpp-test:
+    executor: exectr
+    steps:
+      - attach_workspace:
+          at: lib/cpp/build
+      - run:
+          name: Run tests
+          command: |
+            ./tests/zddm_test --gtest_output=XML
+      - store_test_results:
+          path: lib/cpp/build
+
+workflows:
+  version: 2
+  cpp-build-and-test:
+    jobs:
+      - cpp-build
+      - cpp-test:
+          requires:
+            - cpp-build
+
+
