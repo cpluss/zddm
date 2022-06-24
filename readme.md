@@ -1,5 +1,7 @@
 # Zero Downtime Data Migration [ZDDM]
 
+[![cpluss](https://circleci.com/gh/cpluss/zddm.svg?style=shield&circle-token=ec07e2973d4d542b1d128849483915046b32c6e3)](https://app.circleci.com/pipelines/github/cpluss/zddm?branch=main&filter=all)
+
 Migrating data between two databases, storage solutions, or backends, is hard. It often involves downtime which disrupts your revenue stream, and often end up with data contention and staleness in the end.
 
 ZDDM aims to provide a technique which facilitates data migration without the need for any database magic. Running migrations can take hours, and taking down your production database during that time is simply not feasible for some people & companies.
@@ -11,6 +13,7 @@ ZDDM aims to provide a technique which facilitates data migration without the ne
 ## :warning: WORK IN PROGRESS :warning:
 
 This is a work-in-progress, and is not finished yet. See the "Roadmap" section below for more details on where we are and where we are going.
+
 
 ## How does it work?
 
