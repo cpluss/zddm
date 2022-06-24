@@ -39,6 +39,7 @@ The basic idea is that we proxy every storage operation through ZDDM, and ZDDM t
     - [ ] [STRETCH] Write-back to reduce latency impact
   - [ ] Storage adapters
   - [ ] Deterministic Rollout/Gating Strategy
+  - [ ] Data consistency checks
 - [ ] Language support
     - [ ] Core Language support
        - [ ] C++
