@@ -30,7 +30,8 @@ jobs:
       - run:
           name: Run tests
           command: |
-            ./lib/cpp/build/tests/zddm_test --gtest_output=XML
+            cd lib/cpp/build
+            tests/zddm_test --gtest_output=XML
       - store_test_results:
           path: lib/cpp/build
 
