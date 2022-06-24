@@ -31,7 +31,7 @@ jobs:
           name: Run tests
           command: |
             cd lib/cpp/build
-            tests/zddm_test --gtest_output="xml:report.txt"
+            tests/zddm_test --gtest_output="xml:test-results.xml"
       - store_test_results:
           path: lib/cpp/build
 
