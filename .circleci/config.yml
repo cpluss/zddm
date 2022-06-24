@@ -20,17 +20,17 @@ jobs:
             cmake --build .
       - persist_to_workspace:
           root: .
-          paths: lib/cpp/build
+          paths: [lib/cpp/build]
 
   cpp-test:
     executor: exectr
     steps:
       - attach_workspace:
-          at: lib/cpp/build
+          at: .
       - run:
           name: Run tests
           command: |
-            ./tests/zddm_test --gtest_output=XML
+            ./lib/cpp/build/tests/zddm_test --gtest_output=XML
       - store_test_results:
           path: lib/cpp/build
 
