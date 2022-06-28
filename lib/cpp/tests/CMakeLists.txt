@@ -13,6 +13,7 @@ target_link_libraries(GTest::GTest INTERFACE gtest_main)
 add_executable(zddm_test 
   main.cpp
   ProxyTest.cpp
+  TrafficGateTest.cpp
 )
 
 target_link_libraries(
