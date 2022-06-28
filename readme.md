@@ -35,6 +35,8 @@ The basic idea is that we proxy every storage operation through ZDDM, and ZDDM t
 
 ## :wrench: Roadmap for v1 
 
+Aim is to build a storage agnostic core which provides the plumbing necessary to pull this off using a plugin-architecture. We should work on adding ready-to-use functionality to interface with standard storage solutions in future iterations (if we get there).
+
 - [ ] Design
   - [ ] Main API & Abstractions
   - [ ] Cache Strategies
@@ -49,6 +51,15 @@ The basic idea is that we proxy every storage operation through ZDDM, and ZDDM t
        - [ ] Go
        - [ ] JavaScript / Node
     - [ ] Self-Service guide to add Language Support
+- [ ] Tests & Verification
+  - [ ] Integration with in-memory unit-test
+  - [ ] [STRETCH] Test-suite
+- [ ] Documentation
+  - [ ] Language Docs (how to use)
+    - [ ] C++
+    - [ ] Go
+    - [ ] Javascript / Node
+  - [ ] Rollout guide (how to use the tech)
 
 ## FAQ
 
