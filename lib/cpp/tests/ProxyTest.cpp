@@ -1,10 +1,19 @@
 #include <gtest/gtest.h>
 #include <zddm/Proxy.h>
+#include <zddm/hashers/SimpleHasher.h>
 
 #include <optional>
 #include <unordered_map>
 
 namespace {
+
+// Always open traffic-gate to make the tests easier
+template <typename K>
+std::unique_ptr<zddm::TrafficGate<K>> createAlwaysOnGate() {
+  auto hasher = std::make_unique<zddm::hashers::SimpleHasher<K>>();
+  return std::make_unique<zddm::TrafficGate<K>>(
+      1.0 /* rate = 1.0 means always pass */, std::move(hasher));
+}
 
 class TestStorageAdapter
     : public zddm::StorageAdapter<std::string, std::string> {
@@ -41,6 +50,7 @@ namespace zddm::tests {
 
 TEST(ProxyTests, TestIsEnabled) {
   zddm::Proxy<std::string, std::string> proxy(
+      createAlwaysOnGate<std::string>(),
       /* old */ std::make_unique<TestStorageAdapter>(),
       /* new */ std::make_unique<TestStorageAdapter>());
 
@@ -61,7 +71,8 @@ TEST(ProxyTests, TestShouldAlwaysReadOldOnDisabled) {
   old_adapter->write("foo", "old_bar");
   new_adapter->write("foo", "bar");
 
-  zddm::Proxy<std::string, std::string> proxy(std::move(old_adapter),
+  zddm::Proxy<std::string, std::string> proxy(createAlwaysOnGate<std::string>(),
+                                              std::move(old_adapter),
                                               std::move(new_adapter));
 
   proxy.disable();
@@ -77,7 +88,8 @@ TEST(ProxyTests, TestShouldAlwaysWriteOldOnDisabled) {
   old_adapter->write("foo", "bar");
   new_adapter->write("foo", "bar");
 
-  zddm::Proxy<std::string, std::string> proxy(std::move(old_adapter),
+  zddm::Proxy<std::string, std::string> proxy(createAlwaysOnGate<std::string>(),
+                                              std::move(old_adapter),
                                               std::move(new_adapter));
 
   proxy.disable();
@@ -94,7 +106,8 @@ TEST(ProxyTests, TestShouldReadWithPriorityForNew) {
   old_adapter->write("foo", "old_bar");
   new_adapter->write("foo", "bar");
 
-  zddm::Proxy<std::string, std::string> proxy(std::move(old_adapter),
+  zddm::Proxy<std::string, std::string> proxy(createAlwaysOnGate<std::string>(),
+                                              std::move(old_adapter),
                                               std::move(new_adapter));
 
   // As we access "foo" we should hit the new storage first by default
@@ -111,7 +124,8 @@ TEST(ProxyTests, TestShouldReadOldOnMiss) {
   // different data [for testing purposes].
   old_adapter->write("foo", "old_foo");
 
-  zddm::Proxy<std::string, std::string> proxy(std::move(old_adapter),
+  zddm::Proxy<std::string, std::string> proxy(createAlwaysOnGate<std::string>(),
+                                              std::move(old_adapter),
                                               std::move(new_adapter));
 
   // As we access "foo" we should hit the new storage first by default
@@ -132,7 +146,8 @@ TEST(ProxyTests, TestShouldReadOldOnAndCopyOnMiss) {
   // after handing over ownership of `new_adapter`.
   auto new_storage = new_adapter->getStorage();
 
-  zddm::Proxy<std::string, std::string> proxy(std::move(old_adapter),
+  zddm::Proxy<std::string, std::string> proxy(createAlwaysOnGate<std::string>(),
+                                              std::move(old_adapter),
                                               std::move(new_adapter));
 
   // First read should hit the old storage successfully
@@ -162,7 +177,8 @@ TEST(ProxyTests, TestShouldDoubleWrite) {
   auto old_storage = old_adapter->getStorage();
   auto new_storage = new_adapter->getStorage();
 
-  zddm::Proxy<std::string, std::string> proxy(std::move(old_adapter),
+  zddm::Proxy<std::string, std::string> proxy(createAlwaysOnGate<std::string>(),
+                                              std::move(old_adapter),
                                               std::move(new_adapter));
 
   // Updating "foo" should write the update to both storage solutions

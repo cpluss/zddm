@@ -19,7 +19,10 @@ T Proxy<K, T>::read(K const& key) const {
   // we can query the old storage solution, and safely
   // unwrap the return value as it is expected to always
   // work (or throw exceptions otherwise).
-  if (!isEnabled()) {
+  //
+  // Check if we should do any migration for this key or not
+  // using the traffic-gate provided.
+  if (!isEnabled() || !gate_->shouldPass(key)) {
     return std::move(old_->read(key).value());
   }
 
@@ -54,10 +57,12 @@ void Proxy<K, T>::write(K const& key, T&& data) {
   // We assume that we would always, even if disabled, want to
   // write to the old storage. It's the de-facto source
   // of truth.
-  //
-  // Note that this is split up in order to avoid an unnecessary
-  // data copy (which the language does implicitly).
-  if (!isEnabled()) {
+  // Check if we should do any migration for this key or not
+  // using the traffic-gate provided
+  if (!isEnabled() || !gate_->shouldPass(key)) {
+    // Note how this is distinctly different from below, as we are
+    // passing ownership directly to avoid copying if we do not
+    // have to.
     old_->write(key, std::move(data));
     return;
   }

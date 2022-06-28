@@ -4,15 +4,18 @@
 #include <optional>
 
 #include "zddm/StorageAdapter.h"
+#include "zddm/TrafficGate.h"
 
 namespace zddm {
 
 template <typename K, typename T>
 class Proxy {
  public:
-  Proxy(std::unique_ptr<StorageAdapter<K, T>> &&old_storage,
+  Proxy(std::unique_ptr<TrafficGate<K>> &&gate,
+        std::unique_ptr<StorageAdapter<K, T>> &&old_storage,
         std::unique_ptr<StorageAdapter<K, T>> &&new_storage)
-      : old_(std::move(old_storage)),
+      : gate_(std::move(gate)),
+        old_(std::move(old_storage)),
         new_(std::move(new_storage)),
         enabled_(true) {}
 
@@ -64,6 +67,7 @@ class Proxy {
   bool isEnabled() const { return enabled_; }
 
  private:
+  std::unique_ptr<TrafficGate<K>> gate_;
   std::unique_ptr<StorageAdapter<K, T>> old_;
   std::unique_ptr<StorageAdapter<K, T>> new_;
   bool enabled_;
