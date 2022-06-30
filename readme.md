@@ -88,3 +88,9 @@ This is definitely a risk, and something to keep an eye out for in the long-run 
 
 * We can mitigate this by leveraging interopability where we can between languages to minimise the surface area of each implementation. 
 * We can mitigate this by providing strict design guidelines & principles that every implementation should adhere to, as well as designating one version as the source-of-truth others should follow.
+
+### What about data not frequently accessed / written?
+
+You'll most likely notice that there are some data that never will be migrated due to the fact thet it's never read nor written. 
+
+**You can run a background migration for data that aren't accessed by your applications (i.e. stale data).** The risk is relatively low as it's a low likelyhood that it'll get accessed, and if it is then the ZDDM proxy will take care of making sure it's copied (and double written) correctly.
