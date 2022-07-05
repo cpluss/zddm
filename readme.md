@@ -38,21 +38,24 @@ The basic idea is that we proxy every storage operation through ZDDM, and ZDDM t
 Aim is to build a storage agnostic core which provides the plumbing necessary to pull this off using a plugin-architecture. We should work on adding ready-to-use functionality to interface with standard storage solutions in future iterations (if we get there).
 
 - [ ] Design
-  - [ ] Main API & Abstractions
-  - [ ] Cache Strategies
-    - [ ] Write-through / Read-through
+  - [x] Main API & Abstractions
+  - [x] Cache Strategies
+    - [x] Write-through / Read-through
     - [ ] [STRETCH] Write-back to reduce latency impact
-  - [ ] Storage adapters
+  - [x] Storage adapters
   - [ ] Deterministic Rollout/Gating Strategy
   - [ ] Data consistency checks
 - [ ] Language support
     - [ ] Core Language support
-       - [ ] C++
+       - [x] C++
        - [ ] Go
        - [ ] JavaScript / Node
     - [ ] Self-Service guide to add Language Support
 - [ ] Tests & Verification
   - [ ] Integration with in-memory unit-test
+    - [x] C++
+    - [ ] Go
+    - [ ] JavaScript / Node
   - [ ] [STRETCH] Test-suite
 - [ ] Documentation
   - [ ] Language Docs (how to use)
