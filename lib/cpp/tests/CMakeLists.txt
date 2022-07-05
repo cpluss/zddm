@@ -14,6 +14,7 @@ add_executable(zddm_test
   main.cpp
   ProxyTest.cpp
   TrafficGateTest.cpp
+  InMemoryMigrationTest.cpp
 )
 
 target_link_libraries(
