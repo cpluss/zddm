@@ -76,7 +76,7 @@ Aim is to build a storage agnostic core which provides the plumbing necessary to
   * Assuming that your production solution (`Old`) can handle the load of reads & writes we slowly gate each write & read to the new storage solution (`New`) with a configurable rate.
   * This means that we would only perform the migration for a fraction of the traffic at a time, which you can slowly control and ramp up as we improve the hit-rate & coverage of the new storage solution.
 
-### Why is this not a proxy or a service?
+### Why is this not a service?
 
 Services introduce unnecessary complexity to the problem.
 
