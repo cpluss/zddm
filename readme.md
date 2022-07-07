@@ -54,7 +54,7 @@ Aim is to build a storage agnostic core which provides the plumbing necessary to
 - [ ] Tests & Verification
   - [ ] Integration with in-memory unit-test
     - [x] C++
-    - [ ] Go
+    - [x] Go
     - [ ] JavaScript / Node
   - [ ] [STRETCH] Test-suite
 - [ ] Documentation
