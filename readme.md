@@ -48,7 +48,7 @@ Aim is to build a storage agnostic core which provides the plumbing necessary to
 - [ ] Language support
     - [ ] Core Language support
        - [x] C++
-       - [ ] Go
+       - [x] Go
        - [ ] JavaScript / Node
     - [ ] Self-Service guide to add Language Support
 - [ ] Tests & Verification
