@@ -8,23 +8,6 @@ import (
 	"github.com/cpluss/zddm/lib/go/zddm"
 )
 
-// This is a hack as we're not really supposed
-// to store primitives, but pointers to complex objects
-func newString(s string) *string {
-	return &s
-}
-
-func createAlwaysOnGate() *zddm.TrafficGate[string] {
-	return zddm.NewTrafficGate[string](
-		1.0, /* rate = 1.0 means always pass */
-		&simpleHasher{},
-	)
-}
-
-func createTestStorageAdapter() *zddm.InMemoryStorageAdapter[string, string] {
-	return zddm.NewInMemoryStorageAdapter[string, string]()
-}
-
 func TestProxyIsEnabled(t *testing.T) {
 	assert := assert.New(t)
 	proxy := zddm.NewProxy[string, string](

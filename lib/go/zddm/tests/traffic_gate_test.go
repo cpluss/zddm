@@ -1,8 +1,6 @@
 package tests
 
 import (
-	"hash/fnv"
-	"math"
 	"strconv"
 	"testing"
 
@@ -10,17 +8,6 @@ import (
 
 	"github.com/cpluss/zddm/lib/go/zddm"
 )
-
-type simpleHasher struct{}
-
-func (*simpleHasher) Hash(key string) uint64 {
-	h := fnv.New64a()
-	h.Write([]byte(key))
-	return h.Sum64()
-}
-func (*simpleHasher) MaxSize() uint64 {
-	return math.MaxUint64
-}
 
 func TestTrafficGateSetRate(t *testing.T) {
 	assert := assert.New(t)
