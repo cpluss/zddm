@@ -3,7 +3,7 @@ version: 2.1
 executors:
   go-executor:
     docker:
-      - image: circleci/golang:1.18
+      - image: cimg/go:1.18
   cpp-executor:
     docker:
       - image: cimg/base:stable
