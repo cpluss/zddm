@@ -1,13 +1,16 @@
 version: 2.1
 
 executors:
-  exectr:
+  go-executor:
+    docker:
+      - image: circleci/golang:1.18
+  cpp-executor:
     docker:
       - image: cimg/base:stable
 
 jobs:
   cpp-build:
-    executor: exectr
+    executor: cpp-executor
     steps:
       - checkout
       - run:
@@ -23,7 +26,7 @@ jobs:
           paths: [lib/cpp/build]
 
   cpp-test:
-    executor: exectr
+    executor: cpp-executor
     steps:
       - attach_workspace:
           at: .
@@ -35,8 +38,21 @@ jobs:
       - store_test_results:
           path: lib/cpp/build
 
+  go-test:
+    executor: go-executor
+    steps:
+      - checkout
+      - run:
+          name: Run tests
+          command: |
+            PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
+            gotestsum --junitfile /tmp/test-results.xml -- $PACKAGE_NAMES
+
 workflows:
   version: 2
+  go-test:
+    jobs:
+      - go-test
   cpp-build-and-test:
     jobs:
       - cpp-build
