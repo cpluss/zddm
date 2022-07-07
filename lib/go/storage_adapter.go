@@ -15,9 +15,28 @@ package zddm
 //
 // Note that this could be a call to virtually anything, even a local
 // API.
-type StorageAdapter[K any, T any] interface {
+type StorageAdapter[K comparable, T any] interface {
 	// Read performs a read towards the storage backend.
 	Read(key K) *T
 	// Write performs a write towards the storage backend.
 	Write(key K, data *T)
+}
+
+// InMemoryStorageAdapter is a simple wrapper around a map.
+//
+// Note that this takes ownership of a container to store the data
+// within. This helps minimise the surface area for a mutex in case
+// you are accessing this in a concurrent environment.
+//
+// Note that this is *not thread safe*.
+type InMemoryStorageAdapter[K comparable, T any] struct {
+	container_ map[K]*T
+}
+
+func (self *InMemoryStorageAdapter[K, T]) Read(key K) *T {
+	return self.container_[key]
+}
+
+func (self *InMemoryStorageAdapter[K, T]) Write(key K, data *T) {
+	self.container_[key] = data
 }

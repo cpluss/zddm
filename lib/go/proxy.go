@@ -1,14 +1,14 @@
 package zddm
 
-type Proxy[K any, T any] struct {
+type Proxy[K comparable, T any] struct {
 	old_, new_ StorageAdapter[K, T]
-	gate_      TrafficGate[K]
+	gate_      *TrafficGate[K]
 
 	enabled_ bool
 }
 
-func NewProxy[K any, T any](
-	gate TrafficGate[K],
+func NewProxy[K comparable, T any](
+	gate *TrafficGate[K],
 	old StorageAdapter[K, T],
 	new StorageAdapter[K, T],
 ) *Proxy[K, T] {
@@ -36,7 +36,7 @@ func (self *Proxy[K, T]) Enable() {
 // Disable the proxy functionality, which will
 // disable traffic being sent to the new storage backend.
 func (self *Proxy[K, T]) Disable() {
-	self.enabled_ = true
+	self.enabled_ = false
 }
 
 // Read performs a proxied read from either of the storage adapters

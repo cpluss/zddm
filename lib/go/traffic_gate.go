@@ -13,7 +13,7 @@ package zddm
 //
 // Note that the backing hash function you choose depend on the
 // properties of your storage backend and the data you are migrating.
-type DeterministicHasher[K any] interface {
+type DeterministicHasher[K comparable] interface {
 	Hash(key K) uint64
 	MaxSize() uint64
 }
@@ -30,12 +30,12 @@ type DeterministicHasher[K any] interface {
 //
 // The better hit-rate we have when reading & writing from the new
 // storage backend, the better.
-type TrafficGate[K any] struct {
+type TrafficGate[K comparable] struct {
 	hasher_ DeterministicHasher[K]
 	rate_   float64
 }
 
-func NewTrafficGate[K any](rate float64, hasher DeterministicHasher[K]) *TrafficGate[K] {
+func NewTrafficGate[K comparable](rate float64, hasher DeterministicHasher[K]) *TrafficGate[K] {
 	return &TrafficGate[K]{
 		hasher_: hasher,
 		rate_:   rate,
