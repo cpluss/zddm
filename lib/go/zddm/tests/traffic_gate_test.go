@@ -1,4 +1,4 @@
-package zddm
+package tests
 
 import (
 	"fmt"
@@ -6,6 +6,8 @@ import (
 	"math"
 	"strconv"
 	"testing"
+
+	"github.com/cpluss/zddm/lib/go/zddm"
 )
 
 type simpleHasher struct{}
@@ -27,7 +29,7 @@ func assertNear(t *testing.T, a float64, b float64, precision float64, msg strin
 }
 
 func TestTrafficGateSetRate(t *testing.T) {
-	gate := NewTrafficGate[string](0.0 /* rate */, &simpleHasher{})
+	gate := zddm.NewTrafficGate[string](0.0 /* rate */, &simpleHasher{})
 
 	if gate.GetRate() != 0.0 {
 		t.Error("We should start closed by default")
@@ -47,7 +49,7 @@ func TestTrafficGatePassRates(t *testing.T) {
 	// 50%
 	rate := 0.5
 
-	gate := NewTrafficGate[string](rate /* rate */, &simpleHasher{})
+	gate := zddm.NewTrafficGate[string](rate /* rate */, &simpleHasher{})
 	passes := 0
 	blocks := 0
 	for i := 0; i < N; i++ {

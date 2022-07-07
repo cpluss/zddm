@@ -33,6 +33,12 @@ type InMemoryStorageAdapter[K comparable, T any] struct {
 	container_ map[K]*T
 }
 
+func NewInMemoryStorageAdapter[K comparable, T any]() *InMemoryStorageAdapter[K, T] {
+	return &InMemoryStorageAdapter[K, T]{
+		container_: make(map[K]*T),
+	}
+}
+
 func (self *InMemoryStorageAdapter[K, T]) Read(key K) *T {
 	return self.container_[key]
 }

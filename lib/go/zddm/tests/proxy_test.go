@@ -1,9 +1,11 @@
-package zddm
+package tests
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/cpluss/zddm/lib/go/zddm"
 )
 
 // This is a hack as we're not really supposed
@@ -12,22 +14,20 @@ func newString(s string) *string {
 	return &s
 }
 
-func createAlwaysOnGate() *TrafficGate[string] {
-	return NewTrafficGate[string](
+func createAlwaysOnGate() *zddm.TrafficGate[string] {
+	return zddm.NewTrafficGate[string](
 		1.0, /* rate = 1.0 means always pass */
 		&simpleHasher{},
 	)
 }
 
-func createTestStorageAdapter() *InMemoryStorageAdapter[string, string] {
-	return &InMemoryStorageAdapter[string, string]{
-		container_: make(map[string]*string),
-	}
+func createTestStorageAdapter() *zddm.InMemoryStorageAdapter[string, string] {
+	return zddm.NewInMemoryStorageAdapter[string, string]()
 }
 
 func TestProxyIsEnabled(t *testing.T) {
 	assert := assert.New(t)
-	proxy := NewProxy[string, string](
+	proxy := zddm.NewProxy[string, string](
 		createAlwaysOnGate(),
 		/* old */ createTestStorageAdapter(),
 		/* new */ createTestStorageAdapter(),
@@ -49,7 +49,7 @@ func TestProxyShouldAlwaysReadOldOnDisabled(t *testing.T) {
 	old_adapter.Write("foo", newString("old_bar"))
 	new_adapter.Write("foo", newString("bar"))
 
-	proxy := NewProxy[string, string](
+	proxy := zddm.NewProxy[string, string](
 		createAlwaysOnGate(),
 		old_adapter,
 		new_adapter,
@@ -68,7 +68,7 @@ func TestProxyShouldAlwaysWriteOldOnDisabled(t *testing.T) {
 	old_adapter.Write("foo", newString("old_bar"))
 	new_adapter.Write("foo", newString("bar"))
 
-	proxy := NewProxy[string, string](
+	proxy := zddm.NewProxy[string, string](
 		createAlwaysOnGate(),
 		old_adapter,
 		new_adapter,
@@ -91,7 +91,7 @@ func TestProxyShouldReadWithPriorityForNew(t *testing.T) {
 	old_adapter.Write("foo", newString("old_bar"))
 	new_adapter.Write("foo", newString("bar"))
 
-	proxy := NewProxy[string, string](
+	proxy := zddm.NewProxy[string, string](
 		createAlwaysOnGate(),
 		old_adapter,
 		new_adapter,
@@ -107,7 +107,7 @@ func TestProxyShouldReadOldOnMiss(t *testing.T) {
 	// We should only have one value in the old storage
 	old_adapter.Write("foo", newString("old_bar"))
 
-	proxy := NewProxy[string, string](
+	proxy := zddm.NewProxy[string, string](
 		createAlwaysOnGate(),
 		old_adapter,
 		new_adapter,
@@ -124,7 +124,7 @@ func TestProxyShouldReadOldAndCopyOnMiss(t *testing.T) {
 	// We should only have one value in the old storage
 	old_adapter.Write("foo", newString("bar"))
 
-	proxy := NewProxy[string, string](
+	proxy := zddm.NewProxy[string, string](
 		createAlwaysOnGate(),
 		old_adapter,
 		new_adapter,
@@ -153,7 +153,7 @@ func TestProxyShouldDoubleWrite(t *testing.T) {
 	// We should only have one value in the old storage
 	old_adapter.Write("foo", newString("bar"))
 
-	proxy := NewProxy[string, string](
+	proxy := zddm.NewProxy[string, string](
 		createAlwaysOnGate(),
 		old_adapter,
 		new_adapter,
