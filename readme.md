@@ -17,9 +17,7 @@ This is a work-in-progress, and is not finished yet. See the "Roadmap" section b
 
 ## How does it work?
 
-ZDDM is a technique which you can leverage in order to reduce the downtime introduced by your data migrations in production. 
-
-You proxy each read, and write, through the ZDDM API for your chosen language [*if supported*] and it does in turn manage the migration for you in real-time. Once the migration is done you remove ZDDM as a middleware and call it a day.
+You proxy each read, and write, through the ZDDM API for your chosen language [*if supported*] and it does in turn manage the migration for you in real-time. Once the migration is done you remove ZDDM as a middleware and call it a day. [This is described in more detail in the design sections](https://github.com/cpluss/zddm/tree/main/design#behaviour).
 
 ![](https://lucid.app/publicSegments/view/086079d1-77b0-4c84-a230-f9c8e1b70283/image.png)
 
