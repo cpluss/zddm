@@ -57,7 +57,7 @@ Aim is to build a storage agnostic core which provides the plumbing necessary to
   - [ ] [STRETCH] Test-suite
 - [ ] Documentation
   - [ ] Language Docs (how to use)
-    - [ ] C++
+    - [x] C++
     - [ ] Go
     - [ ] Javascript / Node
   - [ ] Rollout guide (how to use the tech)
