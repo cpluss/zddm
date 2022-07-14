@@ -8,6 +8,20 @@
 
 namespace zddm {
 
+/**
+ * @brief Proxy provides the main interface for ZDDM. It acts
+ * as a wrapper to route traffic between two storage adapters, based
+ * on a traffic-gate to manage how much of traffic will be diverted
+ * to the new storage adapter from the old.
+ *
+ * NOTE: This is only thread-safe if the underlying
+ * storage adapters are thread-safe.
+ *
+ * @tparam K The key over which to read the data, this
+ * would often map to your primary key, or some index.
+ * @tparam T The data-type which we aim to read, this could map
+ * to a primitive or something more complex.
+ */
 template <typename K, typename T>
 class Proxy {
  public:

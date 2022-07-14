@@ -1,5 +1,12 @@
 package zddm
 
+// Proxy provides the main interface for ZDDM. It acts
+// as a wrapper to route traffic between two storage adapters, based
+// on a traffic-gate to manage how much of traffic will be diverted
+// to the new storage adapter from the old.
+//
+// NOTE: This is only thread-safe if the underlying
+// storage adapters are thread-safe.
 type Proxy[K comparable, T any] struct {
 	old_, new_ StorageAdapter[K, T]
 	gate_      *TrafficGate[K]
