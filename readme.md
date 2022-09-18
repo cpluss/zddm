@@ -47,18 +47,21 @@ Aim is to build a storage agnostic core which provides the plumbing necessary to
     - [ ] Core Language support
        - [x] C++
        - [x] Go
+       - [ ] Erlang
        - [ ] JavaScript / Node
     - [ ] Self-Service guide to add Language Support
 - [ ] Tests & Verification
   - [ ] Integration with in-memory unit-test
     - [x] C++
     - [x] Go
+    - [ ] Erlang
     - [ ] JavaScript / Node
   - [ ] [STRETCH] Test-suite
 - [ ] Documentation
   - [ ] Language Docs (how to use)
     - [x] C++
-    - [ ] Go
+    - [x] Go
+    - [ ] Erlang
     - [ ] Javascript / Node
   - [ ] Rollout guide (how to use the tech)
 
