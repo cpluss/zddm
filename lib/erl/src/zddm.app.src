@@ -1,0 +1,14 @@
+{application, zddm,
+ [{description, "Zero Downtime Data Migration - github.com/cpluss/zddm"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {applications,
+   [kernel,
+    stdlib
+   ]},
+  {env,[]},
+  {modules, []},
+
+  {licenses, ["MIT"]},
+  {links, [{"Github", "https://github.com/cpluss/zddm"}]}
+ ]}.
