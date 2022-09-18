@@ -19,3 +19,6 @@ _build
 *.iml
 rebar3.crashdump
 *~
+_build/
+rebar.lock
+lib/erl/doc
