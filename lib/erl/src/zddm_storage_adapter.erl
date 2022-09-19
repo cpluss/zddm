@@ -40,7 +40,17 @@
     storage_adapter/2
 ]).
 
--export([read/2, write/3]).
+-export([
+    read/2,
+    write/3,
+    create/2
+]).
+
+create(ReadFun, WriteFun) ->
+    #{
+        read_fun => ReadFun,
+        write_fun => WriteFun
+    }.
 
 %% @doc read grabs the read function from the storage
 %% adapter and runs it against K. This acts as a simple
