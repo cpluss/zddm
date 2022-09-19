@@ -25,7 +25,7 @@ pass_rate_test_() ->
     NumSamples = 100000,
     % 50%
     Rate = 0.5,
-    Gate = zddm_traffic_gate:create_gate(
+    Gate = zddm_traffic_gate:create(
         Rate,
         fun zddm_hashers:sha_hash_rate/1
     ),
@@ -37,7 +37,6 @@ pass_rate_test_() ->
     ],
     NumPasses = length([R || R <- Results, R =:= true]),
     NumBlocks = length([R || R <- Results, R =/= true]),
-    ?debugFmt("NumPasses = ~p, NumBlocks = ~p", [NumPasses, NumBlocks]),
 
     % We should be within 0.1% precision
     ErrorMargin = 0.001,
@@ -47,8 +46,13 @@ pass_rate_test_() ->
     PassDiff = abs(PassTarget - NumPasses),
     BlockTarget = (1.0 - Rate) * NumSamples,
     BlockDiff = abs(BlockTarget - NumBlocks),
-    ?debugFmt("PassDiff = ~p, BlockDiff = ~p", [PassDiff, BlockDiff]),
-    ?debugFmt("Error Margin = ~p", [(ErrorMargin * NumSamples)]),
+
+    % Uncomment these in order to get more
+    % debugging information in case this test fails.
+    % ?debugFmt("NumPasses = ~p, NumBlocks = ~p", [NumPasses, NumBlocks]),
+    % ?debugFmt("PassDiff = ~p, BlockDiff = ~p", [PassDiff, BlockDiff]),
+    % ?debugFmt("Error Margin = ~p", [(ErrorMargin * NumSamples)]),
+
     [
         ?_assert(PassDiff < (ErrorMargin * NumSamples)),
         ?_assert(BlockDiff < (ErrorMargin * NumSamples))

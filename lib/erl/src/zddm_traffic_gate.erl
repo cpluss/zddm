@@ -36,15 +36,15 @@
 -export_type([deterministic_hash_rate_fun/1, traffic_gate/1]).
 
 -export([
-    create_gate/2,
+    create/2,
     update_rate/2,
     should_pass/2
 ]).
 
-%% @doc create_gate sets up a new gate configuration with the supplied
+%% @doc create sets up a new gate configuration with the supplied
 %% Rate and HashRate Function.
--spec create_gate(float(), deterministic_hash_rate_fun(K)) -> traffic_gate(K).
-create_gate(Rate, HashRateFun) ->
+-spec create(float(), deterministic_hash_rate_fun(K)) -> traffic_gate(K).
+create(Rate, HashRateFun) ->
     #{rate => Rate, hash_rate_fun => HashRateFun}.
 
 %% @doc update_rate sets the rate of a gate.
