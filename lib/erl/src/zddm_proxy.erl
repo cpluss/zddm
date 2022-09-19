@@ -4,159 +4,123 @@
 %%% on a traffic-gate to manage how much of traffic will be diverted
 %%% to the new storage adapter from the old.
 %%%
-%%% In order to use it you need to define a module which is responsible
-%%% for creating the traffic gate, and the storage adapters. The module
-%%% then acts as a routing point for a gen_server which is spun up
-%%% to route all the traffic locally.
-%%%
-%%% In case you need to scale the local gen_server instance you can do
-%%% so by using something like poolboy. Right now the functionality
-%%% does not exist built-into the proxy itself, unfortunately.
-%%%
 %%% NOTE: This is only thread-safe if the underlying
 %%% storage adapters are thread-safe.
 %%% @end
 %%%-----------------------------------
 -module(zddm_proxy).
 
--behaviour(gen_server).
-
 -export([
-    % actual API to interact
-    read/2,
-    write/3,
+    create/3,
     enable/1,
     disable/1,
-
-    % gen_server exports
-    start_link/1,
-    init/1,
-    handle_call/3,
-    handle_cast/2,
-    terminate/2,
-    code_change/3
+    read/2,
+    write/3
 ]).
 
-%% @doc create_gate creates the traffic gate for this proxy.
--callback create_gate() -> zddm_traffic_gate:traffic_gate(term()).
+-type proxy(K, V) :: #{
+    gate => zddm_traffic_gate:traffic_gate(K),
+    old_adapter => zddm_storage_adapter:storage_adapter(K, V),
+    new_adapter => zddm_storage_adapter:storage_adapter(K, V),
 
-%% @doc create_adapters creates both the new and the old adapter
-%% for this proxy.
--callback create_adapters() ->
+    enabled => enabled | disabled
+}.
+
+%% @doc create a new proxy that can be passed around and
+%% used to interact with the proxy API. It's enabled
+%% by default.
+-spec create(
+    zddm_traffic_gate:traffic_gate(K),
+    zddm_storage_adapter:storage_adapter(K, V),
+    zddm_storage_adapter:storage_adapter(K, V)
+) -> proxy(K, V).
+create(Gate, OldAdapter, NewAdapter) ->
     #{
-        old_adapter => zddm_storage_adapter:storage_adapter(term(), term()),
-        new_adapter => zddm_storage_adapter:storage_adapter(term(), term())
+        gate => Gate,
+        old_adapter => OldAdapter,
+        new_adapter => NewAdapter,
+        enabled => enabled
     }.
 
-% --
-% public API
+%% @doc enable the proxy functionality.
+enable(Proxy) ->
+    maps:put(enabled, enabled, Proxy).
 
-%% @doc read the key from the specified Module proxy.
-read(Module, Key) ->
-    gen_server:call(Module, {?FUNCTION_NAME, Key}).
+%% @doc disable the proxy functionality.
+disable(Proxy) ->
+    maps:put(enabled, disabled, Proxy).
 
-%% @doc write the key and data from the specified Module proxy.
-write(Module, Key, Value) ->
-    gen_server:call(Module, {?FUNCTION_NAME, Key, Value}).
+%% @doc performs a read towards the proxy, using the traffic
+%% gate therein to determine whether to read from the new
+%% storage or the old storage accordingly.
+-spec read(proxy(K, V), K) -> {ok, V} | {error, term()}.
+read(
+    #{
+        gate := Gate,
+        old_adapter := OldAdapter,
+        new_adapter := NewAdapter,
 
-%% @doc enable the Module proxy.
-enable(Module) ->
-    gen_server:call(Module, ?FUNCTION_NAME).
-
-%% @doc disable the Module proxy.
-disable(Module) ->
-    gen_server:call(Module, ?FUNCTION_NAME).
-
-% --
-% state management & configuration of the proxy itself
-
-% Our state would is the proxy configuration itself
--record(proxy, {
-    gate :: zddm_traffic_gate:traffic_gate(term()),
-    old_adapter :: zddm_storage_adapter:storage_adapter(term(), term()),
-    new_adapter :: zddm_storage_adapter:storage_adapter(term(), term()),
-
-    enabled :: boolean(),
-    module :: module()
-}).
-
--spec create_proxy(module(), enabled | disabled) -> #proxy{}.
-create_proxy(Module, EnabledEnum) ->
-    Enabled =
-        case EnabledEnum of
-            enabled -> true;
-            _ -> false
-        end,
-    #{old_adapter := OldAdapter, new_adapter := NewAdapter} = Module:create_adapters(),
-    #proxy{
-        gate = Module:create_gate(),
-        old_adapter = OldAdapter,
-        new_adapter = NewAdapter,
-        enabled = Enabled,
-        module = Module
-    }.
-
-% --
-% gen_server callbacks
-start_link([Module]) ->
-    gen_server:start_link({local, Module}, ?MODULE, [Module], []).
-
-init([Module]) ->
-    {ok, create_proxy(Module, enabled)}.
-
-handle_call(disable, _From, Proxy) ->
-    {reply, ok, Proxy#proxy{enabled = false}};
-handle_call(enable, _From, Proxy) ->
-    {reply, ok, Proxy#proxy{enabled = true}};
-handle_call({read, Key}, _From, Proxy) ->
-    ShouldPass =
-        Proxy#proxy.enabled and
-            zddm_traffic_gate:should_pass(Proxy#proxy.gate, Key),
-    case ShouldPass of
+        % We match on enabled here to make sure we're good to go
+        enabled := enabled
+    },
+    Key
+) ->
+    case zddm_traffic_gate:should_pass(Gate, Key) of
         false ->
             % Default to always read from the old gate
-            Result = zddm_storage_adapter:read(Proxy#proxy.old_adapter, Key),
-            {reply, Result, Proxy};
+            zddm_storage_adapter:read(OldAdapter, Key);
         true ->
-            case zddm_storage_adapter:read(Proxy#proxy.new_adapter, Key) of
+            case zddm_storage_adapter:read(NewAdapter, Key) of
                 {ok, Data} ->
-                    {reply, {ok, Data}, Proxy};
+                    {ok, Data};
                 % Default to read old storage on every other result
                 _ ->
-                    case zddm_storage_adapter:read(Proxy#proxy.old_adapter, Key) of
-                        % Propagate errors upwards from the old storage
-                        {error, Error} ->
-                            {reply, {error, Error}, Proxy};
+                    case zddm_storage_adapter:read(OldAdapter, Key) of
                         {ok, Data} ->
                             % Write data to new storage so it'll produce
                             % a hit in the future, and return.
-                            zddm_storage_adapter:write(Proxy#proxy.new_adapter, Key, Data),
-                            {reply, Data, Proxy}
+                            zddm_storage_adapter:write(NewAdapter, Key, Data),
+                            {ok, Data};
+                        % Propagate errors upwards from the old storage
+                        Error ->
+                            Error
                     end
             end
     end;
-handle_call({write, Key, Data}, _From, Proxy) ->
-    case Proxy#proxy.enabled of
+% In case it's disabled we only need to read from the old
+% adapter
+read(#{old_adapter := OldAdapter, enabled := disabled}, Key) ->
+    zddm_storage_adapter:read(OldAdapter, Key).
+
+%% @doc performs a write towards the proxy, using the traffic
+%% gate therein to determine whether to write to the new
+%% storage and the old storage accordingly.
+-spec write(proxy(K, V), K, V) -> ok | {error, term()}.
+write(
+    #{
+        gate := Gate,
+        old_adapter := OldAdapter,
+        new_adapter := NewAdapter,
+
+        % We match on enabled here to make sure we're good to go
+        enabled := enabled
+    },
+    Key,
+    Data
+) ->
+    case zddm_traffic_gate:should_pass(Gate, Key) of
         false ->
-            ok;
+            % Default to only write to the old storage
+            zddm_storage_adapter:write(OldAdapter, Key, Data);
         true ->
             % Write to old first, return error if we get one otherwise proceed with
             % writing to the new storage as the first one was a success.
-            case zddm_storage_adapter:write(Proxy#proxy.old_adapter, Key, Data) of
-                ok -> zddm_storage_adapter:write(Proxy#proxy.new_adapter, Key, Data);
+            case zddm_storage_adapter:write(OldAdapter, Key, Data) of
+                ok -> zddm_storage_adapter:write(NewAdapter, Key, Data);
                 Error -> Error
             end
-    end.
-
-handle_cast(_Msg, Proxy) ->
-    {noreply, Proxy}.
-
-terminate(_Reason, _State) ->
-    ok.
-
-code_change(_OldVersion, Proxy, _Extra) ->
-    % Recreate the proxy in order to use the latest version
-    case Proxy#proxy.enabled of
-        true -> {ok, create_proxy(Proxy#proxy.module, enabled)};
-        false -> {ok, create_proxy(Proxy#proxy.module, disabled)}
-    end.
+    end;
+% In case it's disabled we only need to write to the old
+% adapter
+write(#{old_adapter := OldAdapter, enabled := disabled}, Key, Data) ->
+    zddm_storage_adapter:write(OldAdapter, Key, Data).
