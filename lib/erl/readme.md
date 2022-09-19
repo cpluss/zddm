@@ -1,6 +1,6 @@
-# ZDDM - C++ User Guide
+# ZDDM - Erlang User Guide
 
-Zero Downtime Data Migration [ZDDM] user guide for C++. 
+Zero Downtime Data Migration [ZDDM] user guide for Erlang. 
 
 ![](https://lucid.app/publicSegments/view/ebd5cda8-882e-4b3c-ad09-306b19e1947d/image.png)
 
