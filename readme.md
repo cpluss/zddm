@@ -10,10 +10,6 @@ ZDDM aims to provide a technique which facilitates data migration without the ne
 
 **NOTE**: this is storage agnostic by design. There is no magic involved in how we interact with storages / databases, and is therefore unoptimised towards any specific storage solution.
 
-## :warning: WORK IN PROGRESS :warning:
-
-This is a work-in-progress, and is not finished yet. See the "Roadmap" section below for more details on where we are and where we are going.
-
 
 ## How does it work?
 
@@ -35,34 +31,31 @@ The basic idea is that we proxy every storage operation through ZDDM, and ZDDM t
 
 Aim is to build a storage agnostic core which provides the plumbing necessary to pull this off using a plugin-architecture. We should work on adding ready-to-use functionality to interface with standard storage solutions in future iterations (if we get there).
 
-- [ ] Design
+- [x] Design
   - [x] Main API & Abstractions
   - [x] Cache Strategies
     - [x] Write-through / Read-through
     - [ ] [STRETCH] Write-back to reduce latency impact
   - [x] Storage adapters
-  - [ ] Deterministic Rollout/Gating Strategy
-  - [ ] Data consistency checks
-- [ ] Language support
-    - [ ] Core Language support
+- [x] Language support
+    - [x] Core Language support
        - [x] C++
        - [x] Go
        - [x] Erlang
-       - [ ] JavaScript / Node
-    - [ ] Self-Service guide to add Language Support
-- [ ] Tests & Verification
-  - [ ] Integration with in-memory unit-test
+       - [ ] ~~JavaScript / Node~~
+    - [ ] ~~Self-Service guide to add Language Support~~
+- [x] Tests & Verification
+  - [x] Integration with in-memory unit-test
     - [x] C++
     - [x] Go
     - [x] Erlang
-    - [ ] JavaScript / Node
-- [ ] Documentation
-  - [ ] Language Docs (how to use)
+    - [ ] ~~JavaScript / Node~~
+- [x] Documentation
+  - [x] Language Docs (how to use)
     - [x] C++
     - [x] Go
     - [x] Erlang
-    - [ ] Javascript / Node
-  - [ ] Rollout guide (how to use the tech)
+    - [ ] ~~Javascript / Node~~
 
 ## FAQ
 
