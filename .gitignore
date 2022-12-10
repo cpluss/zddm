@@ -22,3 +22,5 @@ rebar3.crashdump
 _build/
 rebar.lock
 lib/erl/doc
+lib/rust/target
+lib/rust/Cargo.lock
