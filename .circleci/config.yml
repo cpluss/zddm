@@ -59,10 +59,10 @@ jobs:
     steps:
       - checkout
       - run:
-        name: Run tests
-        command: |
-          cd lib/rust
-          cargo test
+          name: Run tests
+          command: |
+            cd lib/rust
+            cargo test
       - store_test_results:
           path: lib/rust 
 
