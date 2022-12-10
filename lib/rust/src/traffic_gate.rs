@@ -1,5 +1,5 @@
-use std::hash::{Hash, Hasher};
 use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
 
 /**
  * @brief DeterministicHasher is an object which takes a
@@ -87,54 +87,49 @@ impl<K> TrafficGate<K> {
 mod tests {
     use super::*;
 
-    macro_rules! assert_near{
-        ($expected:expr, $actual:expr, $error_margin:expr, $msg:expr) => {
-            {
-                let delta = (
-                    (($expected as i64) - ($actual as i64)) 
-                    as i64
-                ).abs();
-                assert!(delta <= ($error_margin), "{}", $msg);
-            }
-        }
+    macro_rules! assert_near {
+        ($expected:expr, $actual:expr, $error_margin:expr, $msg:expr) => {{
+            let delta = ((($expected as i64) - ($actual as i64)) as i64).abs();
+            assert!(delta <= ($error_margin), "{}", $msg);
+        }};
     }
 
     #[test]
     fn pass_rates_test() {
-       const TOTAL: i64 = 100000; 
-       const RATE: f64 = 0.5;
-       const PRECISION: f64 = 0.005;
-       const ERROR_MARGIN: i64 = (TOTAL as f64 * PRECISION) as i64;
+        const TOTAL: i64 = 100000;
+        const RATE: f64 = 0.5;
+        const PRECISION: f64 = 0.005;
+        const ERROR_MARGIN: i64 = (TOTAL as f64 * PRECISION) as i64;
 
-       let gate = TrafficGate {
-        rate: RATE,
-        hasher: Box::new(StandardHasher{})
-       };
+        let gate = TrafficGate {
+            rate: RATE,
+            hasher: Box::new(StandardHasher {}),
+        };
 
-       let mut passes = 0;
-       let mut blocks = 0;
-       for i in 0..TOTAL {
-        if gate.should_pass(&i.to_string()) {
-            passes = passes + 1
-        } else {
-            blocks = blocks + 1
+        let mut passes = 0;
+        let mut blocks = 0;
+        for i in 0..TOTAL {
+            if gate.should_pass(&i.to_string()) {
+                passes = passes + 1
+            } else {
+                blocks = blocks + 1
+            }
         }
-       }
 
-       let expected_passes = (TOTAL as f64) * RATE;
-       assert_near!(
-        expected_passes,
-        passes, 
-        ERROR_MARGIN,
-        format!("Expected {} passes, got {}", expected_passes, passes)
-       );
+        let expected_passes = (TOTAL as f64) * RATE;
+        assert_near!(
+            expected_passes,
+            passes,
+            ERROR_MARGIN,
+            format!("Expected {} passes, got {}", expected_passes, passes)
+        );
 
-       let expected_blocks = (TOTAL as f64) * (1.0 - RATE);
-       assert_near!(
-        expected_blocks, 
-        blocks, 
-        ERROR_MARGIN,
-        format!("Expected {} blocks, got {}", expected_blocks, blocks)
-       );
+        let expected_blocks = (TOTAL as f64) * (1.0 - RATE);
+        assert_near!(
+            expected_blocks,
+            blocks,
+            ERROR_MARGIN,
+            format!("Expected {} blocks, got {}", expected_blocks, blocks)
+        );
     }
 }
