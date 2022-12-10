@@ -7,6 +7,9 @@ executors:
   cpp-executor:
     docker:
       - image: cimg/base:stable
+  rust-executor:
+    docker:
+      - image: cimg/rust:1.65
 
 jobs:
   cpp-build:
@@ -50,6 +53,16 @@ jobs:
             gotestsum --junitfile test-results.xml -- $PACKAGE_NAMES
       - store_test_results:
           path: lib/go 
+
+  rust-test:
+    executor: rust-executor
+    steps:
+      - checkout
+      - run:
+        name: Run tests
+        command: |
+          cd lib/rust
+          cargo test
 
 workflows:
   version: 2
