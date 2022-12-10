@@ -63,8 +63,6 @@ jobs:
           command: |
             cd lib/rust
             cargo test
-      - store_test_results:
-          path: lib/rust 
 
 workflows:
   version: 2
